@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Organizer
 {
@@ -8,8 +11,37 @@ namespace Organizer
         public static void Main(string[] _)
         {
             // Press <F5> to run this code, when "Hello World!" appears in a black box, remove the line below and write your code below.
-            Console.WriteLine("Hello World!");
-            ShowList("Example of ShowList", new List<int>() { -33, 3, 2, 2, 3, 34, 34, 32, 1, 3, 5, 3, -22, -99, 33, -22, 11, 3, 33, 12, -2, -21, 4, 34, 22, 15, 34,-22 });
+            Console.Write("Enter size of array to be sorted: ");
+            var input = Console.ReadLine();
+            if (int.TryParse(input, out int size)) {
+                Console.WriteLine("Sorting array of size " + size);
+            } else {
+                Console.WriteLine("Incorrect input. Exiting...");
+                System.Environment.Exit(0);
+            }
+
+            Stopwatch sw = Stopwatch.StartNew();
+            Random rng = new Random();
+            List<int> l = new List<int>(size);
+            for (int i = 0; i < size; i++) {
+                l.Add(rng.Next(-99, 100));
+            }
+
+            ShowList("Unsorted", l);
+            ShiftHighestSort shift = new ShiftHighestSort();
+            sw.Start();
+            List<int> sorted = shift.Sort(l);
+            sw.Stop();
+            ShowList("Sorted Shift", sorted);
+            Console.WriteLine("Time: " + sw.Elapsed);
+
+            RotateSort quick = new RotateSort();
+            sw.Restart();
+            sorted = quick.Sort(l);
+            sw.Stop();
+            ShowList("Sorted Quick",sorted);
+            Console.WriteLine("Time: " + sw.Elapsed);
+            //ShowList("Example of ShowList", new List<int>() { -33, 3, 2, 2, 3, 34, 34, 32, 1, 3, 5, 3, -22, -99, 33, -22, 11, 3, 33, 12, -2, -21, 4, 34, 22, 15, 34,-22 });
         }
 
 
@@ -23,9 +55,9 @@ namespace Organizer
         public static void ShowList(string label, List<int> theList)
         {
             int count = theList.Count;
-            if (count > 100)
+            if (count > 200)
             {
-                count = 300; // Do not show more than 300 numbers
+                count = 200; // Do not show more than 200 numbers
             }
             Console.WriteLine();
             Console.Write(label);
