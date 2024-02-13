@@ -27,7 +27,14 @@ namespace Organizer
         /// <param name="high">De index within this.array to stop with</param>
         private void SortFunction(int low, int high)
         {
-            throw new NotImplementedException();
+            while (low < high) {
+                for (int i = low; i < high; i++) {
+                    if (this.array[i] > this.array[i + 1]) {
+                        (this.array[i + 1], this.array[i]) = (this.array[i], this.array[i + 1]);
+                    }
+                }
+                high--;
+            }
         }    
     }
 }
