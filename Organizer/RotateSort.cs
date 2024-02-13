@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Organizer
 {
@@ -28,7 +29,10 @@ namespace Organizer
         /// <param name="high">De index within this.array to stop with</param>
         private void SortFunction(int low, int high)
         {
-            throw new NotImplementedException();
+            if (low >= high) { return; }
+            int index = Partitioning(low, high);
+            SortFunction(low, index - 2);
+            SortFunction(index, high);
         }
 
         /// 
@@ -39,7 +43,18 @@ namespace Organizer
         /// <returns>The index in the array of the first of the 'high' digits</returns>
         private int Partitioning(int low, int high)
         {
-            throw new NotImplementedException();
+            int pivot = array[high];
+
+            for (int i = low; i < high; i++) {
+                int result = array[i];
+                if (result > pivot) {
+                    array.RemoveAt(i);
+                    array.Insert(high, result);
+                    i--;
+                    high--;
+                }
+            }
+            return high+1;
         }
     }
 }
