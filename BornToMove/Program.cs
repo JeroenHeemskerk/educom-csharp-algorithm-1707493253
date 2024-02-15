@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Runtime.CompilerServices;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using BornToMove;
 
 namespace Organizer {
@@ -20,14 +13,14 @@ namespace Organizer {
                     List<int> ids = GetAllIds();
                     Random rng = new Random();
                     int selectedMoveId = rng.Next(ids.Count);
-                    Move move = GetMove(selectedMoveId);
+                    Move move = GetMove(ids[selectedMoveId]);
                     StartExercise(move);
                     break;
                 case 1: //list all
                     List<Move> moves = GetAllMoves();
                     DisplayMoves(moves);
                     Console.Write("Please make your selection (Enter the corresponding number): ");
-                    int selectedMove = HandleInput(Enumerable.Range(0,moves.Count).ToArray());
+                    int selectedMove = HandleInput(Enumerable.Range(0,moves.Count+1).ToArray());
                     switch (selectedMove) {
                         case 0: //new move
                             EnterNewMove();
@@ -41,21 +34,61 @@ namespace Organizer {
         }
 
         //--------------------------------------------
-        // Dummy GetFunctions from DB
+        // GetFunctions from DB
         public static List<int> GetAllIds() {
-            return new List<int>([1,2,3]);
+            string connectionString = "Data Source=(localdb)\\born2move;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
+            string queryString = "SELECT id FROM move ORDER BY id;";
+
+            List<int> ids = new List<int>();
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        ids.Add((int)reader["id"]);
+                    }
+                }
+            }
+            return ids;
         }
         public static List<Move> GetAllMoves() {
-            return new List<Move>();
+            string connectionString = "Data Source=(localdb)\\born2move;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
+            string queryString = "SELECT * FROM move;";
+
+            List<Move> moves = new List<Move>();
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        Move m = new Move((int)reader["id"], (string)reader["name"], (string)reader["description"], (int)reader["sweatRate"]);
+                        moves.Add(m);
+                    }
+                }
+            }
+            return moves;
         }
         public static Move GetMove(int id) {
-            return new Move(1,"run", "run fast", 2);
+            string connectionString = "Data Source=(localdb)\\born2move;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
+            string queryString = $"SELECT * FROM move WHERE id={id};";
+
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        Move m = new Move((int)reader["id"], (string)reader["name"], (string)reader["description"], (int)reader["sweatRate"]);
+                        return m;
+                    }
+                }
+            }
+            throw new Exception("Move not found.");
         }
         //--------------------------------------------
         public static void DisplayMoves(List<Move> moves) {
             Console.WriteLine("0 - Make your own move (enter info on a new move)");
             for (int i = 0; i < moves.Count; i++) {
-                Console.WriteLine($"{i} - Name: {moves[i].name} Sweat Rate: {moves[i].sweatRate}");
+                Console.WriteLine($"{i+1} - Name: {moves[i].name, -15} Sweat Rate: {moves[i].sweatRate}");
             }
         }
 

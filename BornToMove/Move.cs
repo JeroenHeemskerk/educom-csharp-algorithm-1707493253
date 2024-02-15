@@ -18,8 +18,8 @@ namespace BornToMove {
         }
 
         public void ShowMove() {
-            Console.WriteLine("Name: " + name);
-            Console.WriteLine("Sweat Rate: " + sweatRate);
+            Console.WriteLine("Name:        " + name);
+            Console.WriteLine("Sweat Rate:  " + sweatRate);
             Console.WriteLine("Description: " + description);
         }
     }
