@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using BornToMove;
 
 namespace Organizer {
@@ -84,6 +85,29 @@ namespace Organizer {
             }
             throw new Exception("Move not found.");
         }
+        public static bool CreateMove(string name, string description, int sweatRate) {
+            string connectionString = "Data Source=(localdb)\\born2move;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
+            string queryString = "INSERT INTO move (name, description, sweatRate)" +
+                                 "VALUES (@name, @description, @sweatRate)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                //add name parameter (to prevent sql injection)
+                command.Parameters.Add("@name", SqlDbType.VarChar);
+                command.Parameters["@name"].Value = name;
+
+                //add description parameter (to prevent sql injection)
+                command.Parameters.Add("@description", SqlDbType.VarChar);
+                command.Parameters["@description"].Value = description;
+
+                //add sweatRate parameter (to prevent sql injection, shouldn't matter for this one)
+                command.Parameters.Add("@sweatRate", SqlDbType.Int);
+                command.Parameters["@sweatRate"].Value = sweatRate;
+                connection.Open();
+                int rows = command.ExecuteNonQuery();
+                return rows > 0;
+            }
+        }
         //--------------------------------------------
         public static void DisplayMoves(List<Move> moves) {
             Console.WriteLine("0 - Make your own move (enter info on a new move)");
@@ -93,7 +117,43 @@ namespace Organizer {
         }
 
         public static void EnterNewMove() {
-            Console.WriteLine("writing to db... (not implemented)");
+            string? moveName;
+            Console.Write("Input your new move's name: ");
+            do {
+                moveName = Console.ReadLine();
+                if (moveName != null) {
+                    if (doesMoveExist(moveName)) {
+                        Console.Write("This name already exists. Try a different one: ");
+                    } else { break; }
+                }
+            } while (true);
+
+            Console.WriteLine("Enter a description for your new move: ");
+            var description = Console.ReadLine();
+
+            Console.Write("Enter a sweatRate for your new move (1-5): ");
+            int sweatRate = HandleInput(Enumerable.Range(1, 5).ToArray());
+
+            if (CreateMove(moveName, description, sweatRate)) {
+                Console.WriteLine("New move created successfully.");
+            } else {
+                Console.WriteLine("Move creation failed. Please try again.");
+            }
+        }
+
+        public static bool doesMoveExist(string moveName) {
+            string connectionString = "Data Source=(localdb)\\born2move;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
+            string queryString = "SELECT id FROM move WHERE name=@name;";
+
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                SqlCommand command = new SqlCommand(queryString, connection);
+                command.Parameters.Add("@name", SqlDbType.VarChar);
+                command.Parameters["@name"].Value = moveName;
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    return reader.HasRows;
+                }
+            }
         }
 
         public static void StartExercise(Move move) {
