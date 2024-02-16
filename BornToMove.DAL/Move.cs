@@ -17,6 +17,12 @@ namespace BornToMove {
             this.sweatRate = sweatRate;
         }
 
+        public Move(string name, string description, int sweatRate) {
+            this.name = name;
+            this.description = description;
+            this.sweatRate = sweatRate;
+        }
+
         public void ShowMove() {
             Console.WriteLine("Name:        " + name);
             Console.WriteLine("Sweat Rate:  " + sweatRate);
