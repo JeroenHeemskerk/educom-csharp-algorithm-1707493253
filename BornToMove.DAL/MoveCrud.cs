@@ -1,54 +1,59 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BornToMove.DAL {
-    public static class MoveCrud {
+    public class MoveCrud {
+        private readonly MoveContext context;
 
-        public static void Create(Move move) {
-            using (var context = new MoveContext()) {
-                context.Database.EnsureCreated();
-                context.Move.Add(move);
-                context.SaveChanges();
-            }
+        public MoveCrud(MoveContext context) {
+            this.context = context;
         }
 
-        public static List<Move> ReadAllMoves() {
-            using (var context = new MoveContext()) {
-                context.Database.EnsureCreated();
-                List<Move> moves = context.Move.ToList<Move>();
-                return moves;
-            }
+        public void Create(Move move) {
+            context.Move.Add(move);
+            context.SaveChanges();
         }
-        public static Move? ReadMoveById(int id) {
-            using (var context = new MoveContext()) {
-                context.Database.EnsureCreated();
-                return context.Move.Where(move=>move.id==id).SingleOrDefault();
-            }
+
+        public List<Move> ReadAllMoves() {
+            List<Move> moves = context.Move.Include("Ratings").ToList<Move>();
+            return moves;
         }
-        public static Move? ReadMoveByName(string name) {
-            using (var context = new MoveContext()) {
-                context.Database.EnsureCreated();
-                return context.Move.Where(move => move.name == name).SingleOrDefault();
-            }
+        public Move? ReadMoveById(int id) {
+            return context.Move.Include("Ratings").Where(move=>move.id==id).SingleOrDefault();
         }
-        public static void Update(Move updatedMove) {
-            using (var context = new MoveContext()) {
-                context.Database.EnsureCreated();
-                context.Move.Update(updatedMove);
-            }
+        public Move? ReadMoveByName(string name) {
+            return context.Move.Include("Ratings").Where(move => move.name == name).SingleOrDefault();
         }
-        public static void Delete(int id) {
-            using (var context = new MoveContext()) {
-                context.Database.EnsureCreated();
-                Move? m = ReadMoveById(id);
-                if (m != null) {
-                    context.Move.Remove(m);
-                }
-                context.SaveChanges();
+        public void Update(Move updatedMove) {
+            context.Move.Update(updatedMove);
+            context.SaveChanges();
+        }
+        public void Delete(int id) {
+            Move? m = ReadMoveById(id);
+            if (m != null) {
+                context.Move.Remove(m);
             }
+            context.SaveChanges();
+        }
+        public void RunSqlCommand(string sql) {
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            context.Database.ExecuteSqlRaw(sql);
+        }
+
+        public void AddRating(MoveRating r) {
+            context.MoveRating.Add(r);
+            context.SaveChanges();
+        }
+
+        public List<MoveRating> ReadAllRatingsByMove(Move move) {
+            context.Database.EnsureCreated();
+            List<MoveRating> ratings = context.MoveRating.Where(rating => rating.Move == move).ToList();
+            return ratings;
         }
     }
 }
