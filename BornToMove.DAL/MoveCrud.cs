@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Organizer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,20 @@ namespace BornToMove.DAL {
         public List<Move> ReadAllMoves() {
             List<Move> moves = context.Move.Include("Ratings").ToList<Move>();
             return moves;
+        }
+        public List<MoveRating> ReadAllMovesSorted() {
+            var mr = new List<MoveRating>();
+            //var moves = context.MoveRating.GroupBy(r => r.Move);
+            var moves = context.Move.GroupJoin(context.MoveRating, m=>m, r=>r.Move, (m, Ratings)=>new {move = m, Ratings});
+            foreach (var moveInfo in moves) {
+                var move = new MoveRating(moveInfo.Ratings.Select(r => r.Rating).DefaultIfEmpty().Average(), 0) {
+                    Move = moveInfo.move
+                };
+                mr.Add(move);
+            }
+            var sorter = new RotateSort<MoveRating>();
+            mr = sorter.Sort(mr, new RatingsComparer());
+            return mr;
         }
         public Move? ReadMoveById(int id) {
             return context.Move.Include("Ratings").Where(move=>move.id==id).SingleOrDefault();

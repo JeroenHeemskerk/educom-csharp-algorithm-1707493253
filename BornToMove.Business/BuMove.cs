@@ -20,9 +20,11 @@ namespace BornToMove.Business {
             return move;
         }
 
-        public List<Move> GetAllMoves() {
-            var moves = moveCrud.ReadAllMoves();
-            return moves;
+        public List<MoveRating> GetAllMoves() {
+            var moveRatings = moveCrud.ReadAllMovesSorted();
+            return moveRatings;
+            //var moves = moveCrud.ReadAllMoves();
+            //return moves;
         }
 
         public bool AddMove(Move m) {

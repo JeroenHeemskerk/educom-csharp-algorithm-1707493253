@@ -22,7 +22,7 @@ namespace BornToMove {
                     StartExercise(move, MoveBL);
                     break;
                 case 1: //list all
-                    List<Move> moves = MoveBL.GetAllMoves();
+                    List<MoveRating> moves = MoveBL.GetAllMoves();
                     DisplayMoves(moves);
                     Console.Write("Please make your selection (Enter the corresponding number): ");
                     int selectedMove = HandleInput(Enumerable.Range(0,moves.Count+1).ToArray());
@@ -31,17 +31,17 @@ namespace BornToMove {
                             EnterNewMove(MoveBL);
                             break;
                         default: //existing move
-                            StartExercise(moves[selectedMove-1], MoveBL);
+                            StartExercise(moves[selectedMove-1].Move, MoveBL);
                             break;
                     }
                     break;
             }
         }
 
-        public static void DisplayMoves(List<Move> moves) {
+        public static void DisplayMoves(List<MoveRating> moves) {
             Console.WriteLine("0 - Make your own move (enter info on a new move)");
             for (int i = 0; i < moves.Count; i++) {
-                Console.WriteLine($"{i+1} - Name: {moves[i].name, -15} Sweat Rate: {moves[i].sweatRate}");
+                Console.WriteLine($"{i+1} - Name: {moves[i].Move.name, -15} Rating: {Math.Round(moves[i].Rating, 2)}");
             }
         }
 
