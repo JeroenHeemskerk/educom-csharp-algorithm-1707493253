@@ -37,8 +37,16 @@ namespace BornToMove.DAL {
             mr = sorter.Sort(mr, new RatingsComparer());
             return mr;
         }
-        public Move? ReadMoveById(int id) {
-            return context.Move.Include("Ratings").Where(move=>move.id==id).SingleOrDefault();
+        public MoveRating? ReadMoveById(int id) {
+            var move = context.Move.Include("Ratings").Where(move=>move.id==id);
+            var moveRating = move.GroupJoin(context.MoveRating, m => m, r => r.Move, (m, Ratings) => new { move = m, Ratings }).SingleOrDefault();
+            if (moveRating != null) {
+                MoveRating m = new MoveRating(moveRating.Ratings.Select(r => r.Rating).DefaultIfEmpty().Average(), 0) {
+                    Move = moveRating.move
+                };
+                return m;
+            }
+            return null;
         }
         public Move? ReadMoveByName(string name) {
             return context.Move.Include("Ratings").Where(move => move.name == name).SingleOrDefault();
@@ -48,7 +56,7 @@ namespace BornToMove.DAL {
             context.SaveChanges();
         }
         public void Delete(int id) {
-            Move? m = ReadMoveById(id);
+            Move? m = ReadMoveById(id)?.Move;
             if (m != null) {
                 context.Move.Remove(m);
             }

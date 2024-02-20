@@ -27,6 +27,12 @@ namespace BornToMove.Business {
             //return moves;
         }
 
+        public MoveRating? GetMoveById(int id) {
+            MoveRating? move = moveCrud.ReadMoveById(id);
+
+            return move;
+        }
+
         public bool AddMove(Move m) {
             if(!doesMoveExist(m.name)) {
                 moveCrud.Create(m);
