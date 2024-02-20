@@ -35,9 +35,9 @@ namespace Organizer
             ShowList("Sorted Shift", sorted);
             Console.WriteLine("Time: " + sw.Elapsed);
 
-            RotateSort quick = new RotateSort();
+            RotateSort<int> quick = new RotateSort<int>();
             sw.Restart();
-            sorted = quick.Sort(l);
+            sorted = quick.Sort(l, Comparer<int>.Default);
             sw.Stop();
             ShowList("Sorted Quick",sorted);
             Console.WriteLine("Time: " + sw.Elapsed);
