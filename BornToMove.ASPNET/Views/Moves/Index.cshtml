@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Moves Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<div>
+    @* <input type="button" value="Move List" onclick="location.href='@Url.Action("Index", "Moves")'" /> *@
+
+    <input class="btn btn-outline-primary" type="button" value="Random Move" onclick="location.href='@Url.Action("Random")'" />
+    <input class="btn btn-outline-primary" type="button" value="Create Move" onclick="location.href='@Url.Action("CreateMove")'" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Move</th>
+                <th>Rating</th>
+                <th>Sweat Rate</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @model IEnumerable<BornToMove.DAL.MoveRating>
+            @{
+                if (Model != null) {
+                    foreach (var move in Model) {
+                        <tr>
+                            <td>
+                                <a asp-controller="Moves" asp-action="Details" asp-route-id="@move.Move.id">@Html.DisplayFor(modelItem => move.Move.name)</a>
+                            </td>
+                            <td> @Html.DisplayFor(modelItem => move.Rating) </td>
+                            <td> @Html.DisplayFor(modelItem => move.Move.sweatRate) </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", new { id = move.Move.id })&nbsp;|
+                                @Html.ActionLink("Details", "Details", new{id = move.Move.id})&nbsp;|
+                                @Html.ActionLink("Delete", "Delete", new { id = move.Move.id })
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+
+</div>

@@ -1,0 +1,40 @@
+﻿@model BornToMove.Move
+@{
+    ViewData["Title"] = "Create Move Page";
+    var Request = this.ViewContext.HttpContext.Request;
+    var name = "";
+    var description = "";
+    var sweatRate = "";
+
+    if (Request.Method == "POST"){
+        name = Request.Form["name"];
+        description = Request.Form["description"];
+        sweatRate = Request.Form["sweatRate"];
+
+        @*var db = Database.Open("WebPagesMovies");
+        var insertCommand = "INSERT INTO Move (name, description, Year) Values(@0, @1, @2)";
+        db.Execute(insertCommand, title, genre, year);
+        Response.Redirect("~/Movies");*@
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<div>
+    @* <input type="button" value="Move List" onclick="location.href='@Url.Action("Index", "Moves")'" /> *@
+    <input type="button" class="btn btn-outline-primary" value="Move List" onclick="location.href='@Url.Action("Index")'" />
+    <input type="button" class="btn btn-outline-primary" value="Random Move" onclick="location.href='@Url.Action("Random")'" />
+
+    <h1>Create a New Move</h1>
+
+    @using(Html.BeginForm("CreateMove", "Moves", FormMethod.Post)) {
+        <span class="input-label">Name:</span> @Html.TextBoxFor(m => m.name) @Html.ValidationMessageFor(m => m.name)<br>
+        <span class="input-label">Description:</span> @Html.TextBoxFor(m => m.description) @Html.ValidationMessageFor(m => m.description)<br>
+        <span class="input-label">Sweat Rate (1-5):</span> @Html.TextBoxFor(m => m.sweatRate) @Html.ValidationMessageFor(m => m.sweatRate)<br>
+        <br>
+        <input type="submit" class="btn btn-secondary" name="buttonSubmit" value="Create Move" />
+    }
+
+</div>

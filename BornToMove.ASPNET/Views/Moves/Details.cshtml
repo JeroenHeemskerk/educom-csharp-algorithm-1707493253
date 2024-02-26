@@ -1,0 +1,53 @@
+﻿
+@{
+    ViewData["Title"] = "Details";
+
+    var Request = this.ViewContext.HttpContext.Request;
+    var rating = "";
+    var intensity = "";
+
+    if (Request.Method == "POST") {
+        rating = Request.Form["name"];
+        intensity = Request.Form["description"];
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<div>
+    <input type="button" class="btn btn-outline-primary" value="Move List" onclick="location.href='@Url.Action("Index")'" />
+    <input type="button" class="btn btn-outline-primary"  value="Random Move" onclick="location.href='@Url.Action("Random")'" />
+    <input type="button" class="btn btn-outline-primary"  value="Create Move" onclick="location.href='@Url.Action("CreateMove")'" />
+
+
+    @model BornToMove.DAL.MoveRating
+    @{
+        if (Model != null) {
+            <h1> @Html.DisplayFor(modelItem => Model.Move.name) </h1>
+            <div> Rating: @Html.DisplayFor(modelItem => Model.Rating)/5</div>
+            <div> Sweat Rate: @Html.DisplayFor(modelItem => Model.Move.sweatRate)/5 </div>
+            <div> @Html.DisplayFor(modelItem => Model.Move.description)</div>
+            <br>
+            <h3>Give a Rating</h3>
+
+            @using (Html.BeginForm("Details", "Moves", FormMethod.Post)) {
+                <span>@Html.HiddenFor(m => m.Move.id)</span>
+                <span>@Html.HiddenFor(m => m.Move.name)</span>
+                <span>@Html.HiddenFor(m => m.Move.description)</span>
+                <span>@Html.HiddenFor(m => m.Move.sweatRate)</span>
+
+                <span class="input-label">Rating (1-5):</span> @Html.TextBoxFor(m => m.Rating, "0") @Html.ValidationMessageFor(m => m.Rating)<br>
+                <span class="input-label">Intensity (1-5):</span> @Html.TextBoxFor(m => m.Vote, "0") @Html.ValidationMessageFor(m => m.Vote)
+
+                <br><br>
+
+                <input type="submit" class="btn btn-secondary" name="buttonSubmit" value="Submit Rating" />
+            }
+        }
+    }
+
+    
+
+</div>
