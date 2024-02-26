@@ -18,8 +18,8 @@ namespace BornToMove {
             int userInput = HandleInput([0, 1]);
             switch (userInput) {
                 case 0: //suggestion
-                    Move move = MoveBL.GetRandomMove();
-                    StartExercise(move, MoveBL);
+                    MoveRating move = MoveBL.GetRandomMove();
+                    StartExercise(move.Move, MoveBL);
                     break;
                 case 1: //list all
                     List<MoveRating> moves = MoveBL.GetAllMoves();
