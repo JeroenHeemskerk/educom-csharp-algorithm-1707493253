@@ -1,15 +1,27 @@
 ﻿using BornToMove.DAL;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BornToMove {
     public class Move {
+
+        [Key]
         public int id {  get; set; }
+
+        [StringLength(255, MinimumLength = 1)]
+        [Required]
         public string name { get; set; }
+
+        [StringLength(255, MinimumLength = 1)]
+        [Required]
         public string description { get; set; }
+
+        [Range(1,5)]
+        [Required]
         public int sweatRate { get; set; }
         virtual public ICollection<MoveRating> Ratings { get; set; }
         public Move(int id, string name, string description, int sweatRate) {
@@ -17,14 +29,14 @@ namespace BornToMove {
             this.name = name;
             this.description = description;
             this.sweatRate = sweatRate;
-            this.Ratings = RatingCrud.ReadAllRatingsByMove(this);
+            this.Ratings = new List<MoveRating>();
         }
 
         public Move(string name, string description, int sweatRate) {
             this.name = name;
             this.description = description;
             this.sweatRate = sweatRate;
-            this.Ratings = RatingCrud.ReadAllRatingsByMove(this);
+            this.Ratings = new List<MoveRating>();
         }
 
         public Move() {
