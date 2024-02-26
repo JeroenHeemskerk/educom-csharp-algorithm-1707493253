@@ -1,5 +1,6 @@
 ﻿using BornToMove.DAL;
 using Microsoft.Data.SqlClient;
+using Organizer;
 using System;
 using System.Data;
 using System.Security.Cryptography;
@@ -12,16 +13,18 @@ namespace BornToMove.Business {
             this.moveCrud = moveCrud;
         }
 
-        public Move GetRandomMove() {
-            List<Move> moves = moveCrud.ReadAllMoves();
+        public MoveRating GetRandomMove() {
+            List<MoveRating> moves = moveCrud.ReadAllMoves();
             Random rng = new Random();
             int selectedMoveId = rng.Next(moves.Count);
-            Move move = moves[selectedMoveId];
+            MoveRating move = moves[selectedMoveId];
             return move;
         }
 
         public List<MoveRating> GetAllMoves() {
-            var moveRatings = moveCrud.ReadAllMovesSorted();
+            var moveRatings = moveCrud.ReadAllMoves();
+            var sorter = new RotateSort<MoveRating>();
+            moveRatings = sorter.Sort(moveRatings, new RatingsComparer());
             return moveRatings;
             //var moves = moveCrud.ReadAllMoves();
             //return moves;
@@ -33,12 +36,25 @@ namespace BornToMove.Business {
             return move;
         }
 
+        public Move? GetMoveByName(string name) {
+            Move? m = moveCrud.ReadMoveByName(name);
+            return m;
+        }
+
         public bool AddMove(Move m) {
             if(!doesMoveExist(m.name)) {
                 moveCrud.Create(m);
                 return true;
             }
             return false;
+        }
+
+        public void DeleteMove(Move m) {
+            moveCrud.Delete(m.id);
+        }
+
+        public void EditMove(Move updatedMove) {
+            moveCrud.Update(updatedMove);
         }
 
         public bool doesMoveExist(string name) {
