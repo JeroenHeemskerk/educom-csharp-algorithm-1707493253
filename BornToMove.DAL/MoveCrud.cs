@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Organizer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,29 +18,22 @@ namespace BornToMove.DAL {
             context.SaveChanges();
         }
 
-        public List<Move> ReadAllMoves() {
-            List<Move> moves = context.Move.Include("Ratings").ToList<Move>();
-            return moves;
-        }
-        public List<MoveRating> ReadAllMovesSorted() {
+        public List<MoveRating> ReadAllMoves() {
             var mr = new List<MoveRating>();
-            //var moves = context.MoveRating.GroupBy(r => r.Move);
-            var moves = context.Move.GroupJoin(context.MoveRating, m=>m, r=>r.Move, (m, Ratings)=>new {move = m, Ratings});
+            var moves = context.Move.GroupJoin(context.MoveRating, m => m, r => r.Move, (m, Ratings) => new { move = m, Ratings });
             foreach (var moveInfo in moves) {
-                var move = new MoveRating(moveInfo.Ratings.Select(r => r.Rating).DefaultIfEmpty().Average(), 0) {
+                var move = new MoveRating(Math.Round(moveInfo.Ratings.Select(r => r.Rating).DefaultIfEmpty().Average(), 2), 0) {
                     Move = moveInfo.move
                 };
                 mr.Add(move);
             }
-            var sorter = new RotateSort<MoveRating>();
-            mr = sorter.Sort(mr, new RatingsComparer());
             return mr;
         }
         public MoveRating? ReadMoveById(int id) {
-            var move = context.Move.Include("Ratings").Where(move=>move.id==id);
+            var move = context.Move.Where(move=>move.id==id);
             var moveRating = move.GroupJoin(context.MoveRating, m => m, r => r.Move, (m, Ratings) => new { move = m, Ratings }).SingleOrDefault();
             if (moveRating != null) {
-                MoveRating m = new MoveRating(moveRating.Ratings.Select(r => r.Rating).DefaultIfEmpty().Average(), 0) {
+                MoveRating m = new MoveRating(Math.Round(moveRating.Ratings.Select(r => r.Rating).DefaultIfEmpty().Average(), 2), 0) {
                     Move = moveRating.move
                 };
                 return m;
